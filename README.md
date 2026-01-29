@@ -156,7 +156,7 @@ pub enum Packet {
 This makes packet processing easier as on frontend and backend.
 
 ## Setup Guide
-1. For set up just run `Severus.exe`
+1. For set up just run `Severus.exe` you can find it [here](https://github.com/gwill1337/Severus/tree/main/App).
 ### Hosting:
 * **Direct:** Configure Port Forwarding, enter your port, and click **Start Host**.
 * **QUIC:** Select Quic mode, click **Start Host**, copy the **Ticket**, and send it to your friend.
