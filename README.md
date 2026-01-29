@@ -39,7 +39,7 @@ I implemented a custom TLS configuration that auto-generates Certificates and Ke
 * **Keys:** PKCS ECDSA P256 SHA256.
 * **Certificates:** Self-signed.
 
-You can see the certificate generation logic [here](https://github.com/gwill1337/Severus/blob/main/src-tauri/src/security.rs).
+You can see the certificate generation logic [here](https://github.com/gwill1337/Severus/blob/main/src-tauri/src/security.rs).     
 For Keys I used PKCS ECDSA P256 SHA256 and self signed certs.
 ```rust
     let key_pair = KeyPair::generate_for(&PKCS_ECDSA_P256_SHA256).unwrap();
