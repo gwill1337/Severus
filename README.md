@@ -177,7 +177,7 @@ This makes packet processing easier as on frontend and backend.
 * Connection Issues: If you cannot connect, try deleting the configuration files to reset keys/trust:
    * **Client:** Delete `known_hosts.json`.
    * **Host:** Delete `cert.pem` and `key.pem`.
-* If you connect via Quic, there sometimes can be a little bit ping, because Quic protocol and Iroh works like this. It might not work if you have, hard/complex NAT (Reflective NAT, NAT Loopback/Hairpinning) or if you're under complex infrastructure.
+* If you connect via Quic, there sometimes can be slight latency, because Quic protocol and Iroh works like this. It might not work if you have, hard/complex NAT (Reflective NAT, NAT Loopback/Hairpinning) or if you're under complex infrastructure.
 
 ## Moved away from
 1. **Double Ratchet:** I decided against the Double Ratchet algorithm (used in Signal) as it is overkill for a lightweight, ephemeral P2P session. Noise_XX provides sufficient security for this use case.
