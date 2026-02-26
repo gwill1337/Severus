@@ -3,7 +3,7 @@
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 
 # Self hosted messenger - Severus
-After few weeks of working on this project, I'm happy to present **"Severus"** or **"Self hosted  lightweight private P2P messenger"** that offers **2 mods of connection**, own **TLS** and **E2EE** *(End to End Encryption)*. You simply need to run the app, choose "Host" or "Client" and start chatting.   
+After few weeks of working on this project, I'm happy to present **"Severus"** or **"Self hosted  lightweight private P2P messenger"** that offers **2 modes of connection**, own **TLS** and **E2EE** *(End to End Encryption)*. You simply need to run the app, choose "Host" or "Client" and start chatting.   
 > **NOTE:** I Built this project to demonstrate my proficiency in **Rust**, **Networking**, **FullStack development**, **System Architecture**, and **Protocols**.
 ### Below are links to the sections:
 * [Network Part](#network-part)
@@ -177,7 +177,7 @@ This makes packet processing easier as on frontend and backend.
 * Connection Issues: If you cannot connect, try deleting the configuration files to reset keys/trust:
    * **Client:** Delete `known_hosts.json`.
    * **Host:** Delete `cert.pem` and `key.pem`.
-* If you connect via Quic, there sometimes can be a little bit ping, because Quic protocol and Iroh works like this. It might doesn't work if you have, hard/complex NAT (Reflective NAT, NAT Loopback/Hairpinning) or if you're under complex infrastructure.
+* If you connect via Quic, there sometimes can be a little bit ping, because Quic protocol and Iroh works like this. It might not work if you have, hard/complex NAT (Reflective NAT, NAT Loopback/Hairpinning) or if you're under complex infrastructure.
 
 ## Moved away from
 1. **Double Ratchet:** I decided against the Double Ratchet algorithm (used in Signal) as it is overkill for a lightweight, ephemeral P2P session. Noise_XX provides sufficient security for this use case.
