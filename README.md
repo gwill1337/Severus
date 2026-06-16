@@ -18,7 +18,7 @@ After few weeks of working on this project, I'm happy to present **"Severus"** o
 ## Network Part
 In this sections will be **"How P2P connection works"**, **"Serialization and Deserialization"** and **More**.
 
-## How works P2P connection:
+## How the P2P Connection Works:
 Severus offers two ways to connect Clients and Hosts:
 1. **Direct Connection** (TCP/LAN)
 2. **Iroh** (QUIC Protocol)
