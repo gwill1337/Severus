@@ -1,6 +1,6 @@
 [package]
 name = "severus"
-version = "1.0.0"
+version = "2.0.0"
 description = "Severus p2p messenger"
 authors = ["Gwill1337"]
 license = "MIT"
