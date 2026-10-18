@@ -23,7 +23,7 @@ pub type Connections = Arc<AsyncMutex<HashMap<ConnectionId, User>>>;
 
 // --------------------- METADATA --------------------------
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum Packet {
     Register {
@@ -84,12 +84,26 @@ pub enum Packet {
         room_name: String,
         users: Vec<UserPublicInfo>,
     },
+    Welcome {
+        id: Uuid,
+    },
+    E2eHandshake {
+        to: Uuid,
+        from: Uuid,
+        step: u8,
+        data: Vec<u8>,
+    },
+    E2eData {
+        to: Uuid,
+        from: Uuid,
+        data: Vec<u8>,
+    },
     
 }
 
 // --------------------- STRUCTS --------------------------
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct UserPublicInfo {
     pub id: Uuid,
     pub username: String,
@@ -126,6 +140,7 @@ pub struct ClientState {
     // pub last_untrusted_fingerprint: AsyncMutex<Option<(String, String)>>,
     pub noise_session: AsyncMutex<Option<NoiseSession>>,
     pub heartbeat: AsyncMutex<HeartbeatState>,
+    pub e2e: AsyncMutex<e2e::E2eState>,
 }
 
 pub struct Room {
@@ -182,8 +197,16 @@ pub async fn send_to (
     }
 }
 
+pub const MAX_BODY_BYTES: usize = 16 * 1024;
+pub const MAX_FRAME_BYTES: usize = 70 * 1024;
+pub fn check_body(body: &str) -> Option<Packet> {
+    (body.len() > MAX_BODY_BYTES).then(|| Packet::Error {
+        message: format!("Message too long (max {} bytes)", MAX_BODY_BYTES),
+    })
+}
 // --------------------- MODS --------------------------
 
 pub mod room;
 pub mod direct;
 pub mod quic;
+pub mod e2e;

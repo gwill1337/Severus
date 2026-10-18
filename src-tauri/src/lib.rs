@@ -21,7 +21,7 @@ mod logger;
 mod security;
 mod net;
 
-use crate::net::room::{create_room, join_room,leave_room, send_room_message_cmd};
+use crate::net::room::{create_room, join_room, leave_room, send_room_message_cmd};
 use crate::net::{ClientState, HeartbeatState, RoomManager, ServerState};
 use crate::net::direct::{ws_handler};
 
@@ -163,6 +163,7 @@ pub fn run() {
                 misses: 0,
             }
         ),
+        e2e: Default::default(),
     });
     let server_state = Arc::new(ServerState {
         connections,

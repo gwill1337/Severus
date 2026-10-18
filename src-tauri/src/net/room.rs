@@ -208,13 +208,23 @@ pub async fn leave_room(
     send_packet_inner(&state, packet).await
 }
 
+// #[tauri::command]
+// pub async fn send_room_message_cmd(
+//     state: tauri::State<'_, Arc<ClientState>>,
+//     room_id: String,
+//     message: String
+// ) -> Result<(), String> {
+//     let packet = Packet::RoomMessage { room_id, body: message };
+//     send_packet_inner(&state, packet).await
+// }
+
 #[tauri::command]
 pub async fn send_room_message_cmd(
+    app: tauri::AppHandle,
     state: tauri::State<'_, Arc<ClientState>>,
     room_id: String,
     message: String
 ) -> Result<(), String> {
-    let packet = Packet::RoomMessage { room_id, body: message };
-    send_packet_inner(&state, packet).await
+    crate::net::e2e::send_room(state.inner(), &app, room_id, message).await
 }
 

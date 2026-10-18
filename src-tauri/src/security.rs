@@ -43,6 +43,7 @@ pub struct TofuVerifier {
 
 pub struct NoiseSession {
     pub state: NoiseState,
+    pub local_public: Vec<u8>,
 }
 
 pub enum NoiseState {
@@ -144,13 +145,13 @@ pub fn load_or_generate_cert(node_id: String) -> (Vec<CertificateDer<'static>>, 
     if Path::new(cert_path).exists() && Path::new(key_path).exists() {
         let cert_bytes = fs::read(cert_path).unwrap();
         let key_bytes = fs::read(key_path).unwrap();
-        
+
         let mut cert_reader = std::io::BufReader::new(&cert_bytes[..]);
         let certs = rustls_pemfile::certs(&mut cert_reader).map(|c| c.unwrap()).collect();
-        
+
         let mut key_reader = std::io::BufReader::new(&key_bytes[..]);
         let key = rustls_pemfile::private_key(&mut key_reader).unwrap().unwrap();
-        
+
         return (certs, key);
     }
 
@@ -166,34 +167,68 @@ pub fn load_or_generate_cert(node_id: String) -> (Vec<CertificateDer<'static>>, 
 
     (vec![cert.der().clone()], PrivateKeyDer::Pkcs8(key_pair.serialize_der().into()))
 }
-
+pub fn safety_number(a: &[u8], b: &[u8]) -> String {
+    let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
+    let mut h = Sha256::new();
+    h.update(lo);
+    h.update(hi);
+    let digest = h.finalize();
+    hex::encode(&digest[..15])
+        .as_bytes()
+        .chunks(5)
+        .map(|c| std::str::from_utf8(c).unwrap())
+        .collect::<Vec<_>>()
+        .join(" ")
+}
 
 impl NoiseSession  {
     pub fn build_noise_client() -> Self {
         let params: NoiseParams = "Noise_XX_25519_ChaChaPoly_SHA256".parse().unwrap();
         let builder = Builder::new(params);
-        let static_key = builder.generate_keypair().unwrap().private;
-        
+        let kp = builder.generate_keypair().unwrap();
+        let local_public = kp.public.clone();
         let initiator = builder
-            .local_private_key(&static_key)
+            .local_private_key(&kp.private)
             .expect("Invalid private key")
             .build_initiator()
-            .expect("Failed to build Noise initiator. Check if all keys are provided.");
-        Self { state: NoiseState::Handshake(initiator) }
+            .expect("Failed to build Noise initiator");
+        Self { state: NoiseState::Handshake(initiator), local_public }
     }
 
     pub fn build_noise_server() -> Self {
         let params: NoiseParams = "Noise_XX_25519_ChaChaPoly_SHA256".parse().unwrap();
-
         let builder = Builder::new(params);
-        let static_key = builder.generate_keypair().unwrap().private;
+        let kp = builder.generate_keypair().unwrap();
+        let local_public = kp.public.clone();
         let responder = builder
-            .local_private_key(&static_key)
+            .local_private_key(&kp.private)
             .expect("Invalid private key")
             .build_responder()
             .expect("Failed to build Noise responder");
-        Self { state: NoiseState::Handshake(responder) }
+        Self { state: NoiseState::Handshake(responder), local_public }
     }
+
+    pub fn remote_static(&self) -> Option<Vec<u8>> {
+        match &self.state {
+            NoiseState::Handshake(hs) => hs.get_remote_static().map(|k| k.to_vec()),
+            NoiseState::Transport(t) => t.get_remote_static().map(|k| k.to_vec()),
+            NoiseState::Empty => None,
+        }
+    }
+
+    // pub fn safety_number(a: &[u8], b: &[u8]) -> String {
+    //     let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
+    //     let mut h = Sha256::new();
+    //     h.update(lo);
+    //     h.update(hi);
+    //     let digest = h.finalize();
+    //     hex::encode(&digest[..15])
+    //         .as_bytes()
+    //         .chunks(5)
+    //         .map(|c| std::str::from_utf8(c).unwrap())
+    //         .collect::<Vec<_>>()
+    //         .join(" ")
+    // }
 
     pub fn encrypt(&mut self, plaintext: &[u8]) -> Result<Vec<u8>, String> {
         let mut buf = vec![0u8; plaintext.len() + 1024]; // Запас под тег и прочее

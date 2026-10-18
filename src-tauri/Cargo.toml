@@ -58,3 +58,5 @@ tokio-util = { version = "0.7", features = ["codec"] }
 bytes = "1"
 
 metrics = "0.24.3"
+rstest = "0.26.1"
+proptest = "1.11.0"
